@@ -16,10 +16,6 @@ Clink was created out of a need for a more versital monitoring tool that provide
  * Provides detailed reports representing such data efficiently. 
  * Configuration to detail scan intervals, summary type, etc.
 
-persistent long running summary/detailed information
-ability to provide scan information from multiple contexets eg inside and outside of a network
-
-
 ### <a name="howitworks"></a>How It Works
 Clink is accompanied...
 
