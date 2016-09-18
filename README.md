@@ -1,8 +1,8 @@
 ## clink
 A distributed (see [Design](#design)) network monitoring tool that is easily operated from the command line. Clink operates via `icmp` ping requests while also collecting other statistics. Clink aims to provide a comprehensive monitoring view of services over a period of time. 
 
-### <a name="why"></a>Why clink
-Clink was created out of a need for a more versital monitoring tool that provided detailed statistics while maintaining the simplicity of traditional network utilities. A key motivation for clink was to provide more comprehensive view of the data collected in a report format that is easily understood. 
+### <a name="why"></a>Why clink?
+Clink was created out of a need for a more versital and long running CLI monitoring tool that provided detailed statistics while maintaining the simplicity of traditional 'query-once' network utilities. A key motivation for clink was to provide more comprehensive view of the data collected in a report format that is easily understood. 
 
 #####The initial design goals of clink:
 * Ability to gather scan information from multiple contexts.
@@ -15,6 +15,8 @@ Clink was created out of a need for a more versital monitoring tool that provide
 * Suitable for persistent long running scans as well as shorter 'query-like' scans.
  * Provides detailed reports representing such data efficiently. 
  * Configuration to detail scan intervals, summary type, etc.
+
+Clink is designed to provide more power in a simpler tool. 
 
 ### <a name="howitworks"></a>How It Works
 Clink is accompanied...
