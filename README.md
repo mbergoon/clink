@@ -67,8 +67,9 @@ sudo clink [options]
 
 
 ### <a name="contributors"></a>Contributors
-
+* cbergoon
+* mbergoon
 
 ### <a name="lisense"></a>License
-
+To follow...
 
