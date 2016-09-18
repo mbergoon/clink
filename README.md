@@ -2,6 +2,23 @@
 A distributed (see [Design](#design)) network monitoring tool that is easily operated from the command line. Clink operates via `icmp` ping requests while also collecting other statistics. Clink aims to provide a comprehensive monitoring view of services over a period of time. 
 
 ### <a name="why"></a>Why clink
+Clink was created out of a need for a more versital monitoring tool that provided detailed statistics while maintaining the simplicity of traditional network utilities. A key motivation for clink was to provide more comprehensive view of the data collected in a report format that is easily understood. 
+
+#####The initial design goals of clink:
+* Ability to gather scan information from multiple contexts.
+ * External nodes powered by companion application `clinkd` provide different contexts.
+ * Show statistics of such a scan in a meaningful manner. 
+* Configuration files detailing monitoring configurations.
+ * Simple human readable format. 
+ * Self describing document structure.
+ * Enable user to create comlpex scans that are easily reproducable.
+* Suitable for persistent long running scans as well as shorter 'query-like' scans.
+ * Provides detailed reports representing such data efficiently. 
+ * Configuration to detail scan intervals, summary type, etc.
+
+persistent long running summary/detailed information
+ability to provide scan information from multiple contexets eg inside and outside of a network
+
 
 ### <a name="howitworks"></a>How It Works
 Clink is accompanied...
@@ -32,7 +49,7 @@ $ clink -s ...
 ### <a name="build"></a>Clink Builds
 
 #####Distributions
-Visit the [builds](#build) page for pre-built distributions.
+Visit the [builds](https://github.com/mbergoon/clink/releases) page for pre-built distributions.
 
 #####Building from Source
 Use the following command to retrieve the source: 
@@ -45,7 +62,7 @@ Next, build the project with:
 go install github.com/mbergoon/clink
 ```
 
-The binary should b available in the `bin` folder of the Go workspace. Run it with (sudo is required to send icmp requests):
+The binary should be available in the `bin` folder of the Go workspace. Run it with (sudo is required to send icmp requests):
 ```
 sudo clink [options]
 ```
