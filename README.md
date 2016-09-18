@@ -10,6 +10,28 @@ To follow...
 ### <a name="usage"></a>Usage
 Clink has several modes that can be used to accomplish a variety of tasks. The core functionality of clink provides an interface to monitor a services based on the specification in a config file. ... 
 
+### <a name="build"></a>Clink Builds
+
+#####Distributions
+Visit the [builds](#build) page for pre-built distributions.
+
+#####Building from Source
+Use the following command to retrieve the source: 
+```
+go get github.com/mbergoon/clink
+```
+
+Next, build the project with:
+```
+go install github.com/mbergoon/clink
+```
+
+The binary should b available in the `bin` folder of the Go workspace. Run it with (sudo is required to send icmp requests):
+```
+sudo clink [options]
+```
+
+
 #####<a name="options"></a>Options
 
 ```
