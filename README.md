@@ -60,10 +60,14 @@ Next, build the project with:
 go install github.com/mbergoon/clink
 ```
 
-The binary should be available in the `bin` folder of the Go workspace. Run it with (sudo is required to send icmp requests):
+The binary should be available in the `bin` folder of the Go workspace. Run it with (sudo is required to create raw sockets used for `icmp` - more info below):
 ```
 sudo clink [options]
 ```
+Despite the requirement for root execution inorder to execute this application - it is possible to conceal and/or surpress this requirement in one of two ways. These methods are to be detailed and included in an instalation script to follow. 
+
+* Method 1: Using SETUID extended attribute permission with root user and group. 
+* Method 2: Using Capability Sets granting PERMITTED (in some scenarios INHERITABLE is required) for CAP_NET_RAW capability.
 
 ### <a name="usecases"></a>Use Cases
 
