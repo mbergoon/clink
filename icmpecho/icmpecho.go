@@ -122,18 +122,18 @@ func parseICMPEcho(b []byte) (*icmpEcho, error) {
 }
 
 // Echoer convienence method wrapping Pinger method to gather time and other stats.
-func Echo(address string, timeout int) (ok bool, err error, start time.Time, elapsed time.Duration, length int) {
+func Echo(address string, timeout int) (ok bool, start time.Time, elapsed time.Duration, sent int, received int, err error) {
 	start = time.Now()
-	ok, length, err = Echoer(address, timeout)
+	ok, sent, received, err = Echoer(address, timeout)
 	elapsed = time.Since(start)
 	return
 }
 
 // Echoer provides actual Dial to requested host. Handles response and reports.
-func Echoer(address string, timeout int) (bool, int, error) {
+func Echoer(address string, timeout int) (bool, int, int, error) {
 	c, err := net.Dial("ip4:icmp", address)
 	if err != nil {
-		return false, 0, err
+		return false, 0, 0, err
 	}
 	c.SetDeadline(time.Now().Add(time.Duration(timeout) * time.Millisecond))
 	defer c.Close()
@@ -148,20 +148,21 @@ func Echoer(address string, timeout int) (bool, int, error) {
 		},
 	}).Marshal()
 	if err != nil {
-		return false, len(wb), err
+		return false, len(wb), 0, err
 	}
 	if _, err = c.Write(wb); err != nil {
-		return false, len(wb), err
+		return false, len(wb), 0, err
 	}
 	var m *icmpMessage
 	rb := make([]byte, 20+len(wb))
+	var rbl int
 	for {
-		if _, err = c.Read(rb); err != nil {
-			return false, len(wb), err
+		if rbl, err = c.Read(rb); err != nil {
+			return false, len(wb), rbl, err
 		}
 		rb = ipv4Payload(rb)
 		if m, err = parseICMPMessage(rb); err != nil {
-			return false, len(wb), err
+			return false, len(wb), rbl, err
 		}
 		switch m.Type {
 		case icmpv4EchoRequest, icmpv6EchoRequest:
@@ -169,7 +170,7 @@ func Echoer(address string, timeout int) (bool, int, error) {
 		}
 		break
 	}
-	return true, len(wb), nil
+	return true, len(wb), rbl, nil
 }
 
 // ipv4Payload returns payload of ipv4 ICMP request.
