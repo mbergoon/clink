@@ -2,6 +2,15 @@ package main
 
 import "fmt"
 
+func configure(c *ClinkConfig) {
+	c.HandleFlags()
+}
+
 func main() {
-	fmt.Println("Hello, World!")
+	cconf := NewClinkConfig()
+
+	configure(cconf)
+
+	fmt.Println(*cconf)
+
 }
