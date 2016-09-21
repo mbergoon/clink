@@ -1,4 +1,4 @@
-![alt tag](https://github.com/mbergoon/clink/blob/master/clink.png)
+![alt tag](https://github.com/mbergoon/clink/blob/master/resources/clink.png)
 
 A distributed (see [Design](#design)) network monitoring tool that is easily operated from the command line. Clink operates via `icmp` ping requests while also collecting other statistics. Clink aims to provide a comprehensive monitoring view of services over a period of time. 
 
