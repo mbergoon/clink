@@ -39,10 +39,13 @@ const (
 // ClinkConfig is the configuration for the Clink command. Detailing how the command will
 // execute.
 type ClinkConfig struct {
-	cmdMode    CmdMode
-	execMode   ExecMode
-	configFile string
-	hostUri    string
+	cmdMode        CmdMode
+	execMode       ExecMode
+	configFile     string
+	hostUri        string
+	logLevel       string
+	logMode        string
+	logDestination [4]string
 }
 
 // NewClinkConfig creates a new clink configuration. Note: the values take the zero value
@@ -56,15 +59,22 @@ func NewClinkConfig() *ClinkConfig {
 func commandUsage() {
 	fmt.Printf("Usage: clink -[m|e|r[options]] -[echo|scan[options]] -[host|file]>\n")
 	fmt.Printf("	Command Mode\n")
-	fmt.Printf("		-m 	Management mode\n")
-	fmt.Printf("		-e 	Execute mode\n")
-	fmt.Printf("		-r 	Report mode\n")
+	fmt.Printf("		-m 			Management mode\n")
+	fmt.Printf("		-e 			Execute mode\n")
+	fmt.Printf("		-r 			Report mode\n")
 	fmt.Printf("	Execute Mode\n")
-	fmt.Printf("		-echo 	Execute icmp echo monitoring\n")
-	fmt.Printf("		-pscan 	Execute port scan monitoring\n")
+	fmt.Printf("		-echo 			Execute icmp echo monitoring\n")
+	fmt.Printf("		-pscan			Execute port scan monitoring\n")
 	fmt.Printf("	Input Description\n")
-	fmt.Printf("		-file 	Configuration file to describe execution of monitoring task\n")
-	fmt.Printf("		-host 	Configure clink to launch scan on defined host\n")
+	fmt.Printf("		-file 			Configuration file to describe execution of monitoring task\n")
+	fmt.Printf("		-host 			Configure clink to launch scan on defined host\n")
+	fmt.Printf("	Logging Level\n")
+	fmt.Printf("		-log-level		Set level of logging to include options: [TRACE|INFO|WARNING|ERROR] default: INFO\n")
+	fmt.Printf("	Logging Destination\n")
+	fmt.Printf("		-log-trace-dest		Sets where to write trace log options: [<filename>|DISCARD|STDOUT|STDERR]\n")
+	fmt.Printf("		-log-info-dest		Sets where to write info log options: [<filename>|DISCARD|STDOUT|STDERR]\n")
+	fmt.Printf("		-log-warning-dest	Sets where to write warning log options: [<filename>|DISCARD|STDOUT|STDERR]\n")
+	fmt.Printf("		-log-error-dest		Sets where to write error log options: [<filename>|DISCARD|STDOUT|STDERR]\n")
 }
 
 // HandleFlags initializes the potential settings and parses their value into the config
@@ -86,6 +96,15 @@ func (c *ClinkConfig) HandleFlags() {
 	//File or Host
 	flag.StringVar(&(c.configFile), "file", "clink.conf", "configuration file describing scan")
 	flag.StringVar(&(c.hostUri), "host", "127.0.0.1", "host to scan")
+
+	//Log Level
+	var logLevel = flag.String("log-level", "INFO", "minimum log level to write")
+
+	//Log Destination
+	var logTraceDest = flag.String("log-trace-dest", "STDOUT", "stream or file to write on")
+	var logInfoDest = flag.String("log-info-dest", "STDOUT", "stream or file to write on")
+	var logWarningDest = flag.String("log-warning-dest", "STDERR", "stream or file to write on")
+	var logErrorDest = flag.String("log-error-dest", "STDERR", "stream or file to write on")
 
 	flag.Parse()
 
@@ -110,6 +129,15 @@ func (c *ClinkConfig) HandleFlags() {
 		c.execMode = UNDFMON
 	}
 
+	//Build log config
+	c.logLevel = *logLevel
+
+	var logDests = [4]string{"DISCARD", "STDOUT", "STDOUT", "STDERR"}
+	logDests[0] = *logTraceDest
+	logDests[1] = *logInfoDest
+	logDests[2] = *logWarningDest
+	logDests[3] = *logErrorDest
+	c.logDestination = logDests
 }
 
 // Process to follow...
