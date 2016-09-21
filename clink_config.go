@@ -23,8 +23,10 @@ const (
 )
 
 type ClinkConfig struct {
-	cmdMode  CmdMode
-	execMode ExecMode
+	cmdMode    CmdMode
+	execMode   ExecMode
+	configFile string
+	hostUri    string
 }
 
 // Default Clink configuration values
@@ -38,7 +40,7 @@ func NewClinkConfig() *ClinkConfig {
 }
 
 func commandUsage() {
-	fmt.Printf("Usage: clink -[m|e|r] -[echo|scan] [host|file]>\n")
+	fmt.Printf("Usage: clink -[m|e|r[options]] -[echo|scan[options]] -[host|file]>\n")
 	flag.PrintDefaults()
 }
 
@@ -54,6 +56,10 @@ func (c *ClinkConfig) HandleFlags() {
 	//Execute modes
 	var echo = flag.Bool("echo", false, "execute mode 'icmp echo monitor'")
 	var pscan = flag.Bool("pscan", false, "execute mode 'port scan monitor'")
+
+	//File or Host
+	flag.StringVar(&(c.configFile), "file", "clink.conf", "configuration file describing scan")
+	flag.StringVar(&(c.hostUri), "host", "127.0.0.1", "host to scan")
 
 	flag.Parse()
 
