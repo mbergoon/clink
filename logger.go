@@ -11,8 +11,11 @@ import (
 	"time"
 )
 
-const MAX_LOG_SIZE int64
+// MAX_LOG_SIZE is the moximum size a file can grow to be before the
+// log rotates to a new file.
+const MAX_LOG_SIZE int64 = 80000
 
+// LogLevel describes the level (type) of a log.
 type LogLevel string
 
 const (
@@ -22,6 +25,7 @@ const (
 	ErrorLevel   LogLevel = "ERROR"
 )
 
+// Loggers global to entire applciation.
 var (
 	Trace          *log.Logger
 	Info           *log.Logger
@@ -30,6 +34,7 @@ var (
 	LogDestination [4]string
 )
 
+// InitLoggers uses the clinkn configuration object to initialize loggers.
 func InitLoggers(c *ClinkConfig) (err error) {
 
 	LogDestination = c.logDestination
@@ -83,6 +88,7 @@ func InitLoggers(c *ClinkConfig) (err error) {
 	return nil
 }
 
+// setLoggerHandles sets the writers and boilerplate data to display in each log message.
 func setLoggerHandles(traceHandle io.Writer, infoHandle io.Writer, warningHandle io.Writer, errorHandle io.Writer) {
 	Trace = log.New(traceHandle, "TRACE: ", log.Ldate|log.Ltime|log.Lshortfile)
 	Info = log.New(infoHandle, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
@@ -90,6 +96,8 @@ func setLoggerHandles(traceHandle io.Writer, infoHandle io.Writer, warningHandle
 	Error = log.New(errorHandle, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
 }
 
+// determineCurrentLogFile reads the current directory to determine the current log file
+// given a log name 'writerName'. If none exists returns false and the new file name to create.
 func determineCurrentLogFile(writerName string) (bool, string) {
 	ti := time.Now().UnixNano()
 	t := strconv.Itoa(int(ti))
@@ -118,7 +126,7 @@ func determineCurrentLogFile(writerName string) (bool, string) {
 	return true, maxFname
 }
 
-// LogM logs a message 
+// LogM logs a message to the appropriate level, checking and rolling log file if necessary.
 func LogM(level LogLevel, message string) error {
 	switch level {
 	case TraceLevel:

@@ -11,7 +11,10 @@ func configure(c *ClinkConfig) {
 func appIntro() {
 	//Display message with mode
 	//Log beginning of applciation
-	LogM(InfoLevel, "Hello from log")
+	LogM(InfoLevel, "Hello from info log")
+	LogM(TraceLevel, "Hello from trace log")
+	LogM(WarningLevel, "Hello from warn log")
+	LogM(ErrorLevel, "Hello from error log")
 }
 
 func main() {
@@ -19,7 +22,7 @@ func main() {
 	cconf := NewClinkConfig()
 	configure(cconf)
 
-	for i := 0; i < 100000; i++ {
+	for i := 0; i < 100; i++ {
 		appIntro()
 	}
 
