@@ -11,6 +11,8 @@ import (
 	"time"
 )
 
+const MAX_LOG_SIZE int64
+
 type LogLevel string
 
 const (
@@ -96,7 +98,7 @@ func determineCurrentLogFile(writerName string) (bool, string) {
 	var maxLtime int
 	var maxFname string = ""
 	for _, f := range files {
-		if f.Size() < 80000 {
+		if f.Size() < MAX_LOG_SIZE {
 			fns := strings.Split(f.Name(), ".")
 			if len(fns) == 3 {
 				if fns[0] == writerName && fns[1] == "log" {
@@ -116,6 +118,7 @@ func determineCurrentLogFile(writerName string) (bool, string) {
 	return true, maxFname
 }
 
+// LogM logs a message 
 func LogM(level LogLevel, message string) error {
 	switch level {
 	case TraceLevel:
