@@ -9,8 +9,6 @@ func configure(c *ClinkConfig) {
 }
 
 func appIntro() {
-	//Display message with mode
-	//Log beginning of applciation
 	LogM(InfoLevel, "Hello from info log")
 	LogM(TraceLevel, "Hello from trace log")
 	LogM(WarningLevel, "Hello from warn log")
@@ -21,6 +19,10 @@ func main() {
 
 	cconf := NewClinkConfig()
 	configure(cconf)
+
+	// fmt.Println(CLR_0 + "HELLO" + CLR_N + CLR_R + "HELLO" + CLR_N + CLR_G + "HELLO" + CLR_N + CLR_Y + "HELLO" + CLR_N + CLR_B + "HELLO" + CLR_N + CLR_M + "HELLO" + CLR_N + CLR_C + "HELLO" + CLR_N + CLR_W + "HELLO" + CLR_N)
+
+	// fmt.Println("\x1b[31;1m hello \x1b[0m")
 
 	for i := 0; i < 100; i++ {
 		appIntro()

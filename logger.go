@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-// MAX_LOG_SIZE is the moximum size a file can grow to be before the
+// MAX_LOG_SIZE is the maximum size a file can grow to be before the
 // log rotates to a new file.
 const MAX_LOG_SIZE int64 = 80000
 
@@ -90,10 +90,10 @@ func InitLoggers(c *ClinkConfig) (err error) {
 
 // setLoggerHandles sets the writers and boilerplate data to display in each log message.
 func setLoggerHandles(traceHandle io.Writer, infoHandle io.Writer, warningHandle io.Writer, errorHandle io.Writer) {
-	Trace = log.New(traceHandle, "TRACE: ", log.Ldate|log.Ltime|log.Lshortfile)
-	Info = log.New(infoHandle, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
-	Warning = log.New(warningHandle, "WARNING: ", log.Ldate|log.Ltime|log.Lshortfile)
-	Error = log.New(errorHandle, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
+	Trace = log.New(traceHandle, Color(COLOR_B_BLUE, "TRACE ▶ "), log.Ldate|log.Ltime|log.Lshortfile)
+	Info = log.New(infoHandle, Color(COLOR_B_GREEN, "INFO ▶ "), log.Ldate|log.Ltime|log.Lshortfile)
+	Warning = log.New(warningHandle, Color(COLOR_B_YELLOW, "WARNING ▶ "), log.Ldate|log.Ltime|log.Lshortfile)
+	Error = log.New(errorHandle, Color(COLOR_B_RED, "ERROR ▶ "), log.Ldate|log.Ltime|log.Lshortfile)
 }
 
 // determineCurrentLogFile reads the current directory to determine the current log file
@@ -139,7 +139,7 @@ func LogM(level LogLevel, message string) error {
 			}
 			Trace.SetOutput(logfile)
 		}
-		Trace.Println(message)
+		Trace.Println(ColorClear(COLOR_B_BLUE, " ▶ "+message))
 	case InfoLevel:
 		if LogDestination[1] != "DISCARD" && LogDestination[1] != "STDOUT" && LogDestination[1] != "STDERR" {
 			//Then we are going to file
@@ -150,7 +150,7 @@ func LogM(level LogLevel, message string) error {
 			}
 			Info.SetOutput(logfile)
 		}
-		Info.Println(message)
+		Info.Println(ColorClear(COLOR_B_GREEN, " ▶ "+message))
 	case WarningLevel:
 		if LogDestination[2] != "DISCARD" && LogDestination[2] != "STDOUT" && LogDestination[2] != "STDERR" {
 			//Then we are going to file
@@ -161,7 +161,7 @@ func LogM(level LogLevel, message string) error {
 			}
 			Warning.SetOutput(logfile)
 		}
-		Warning.Println(message)
+		Warning.Println(ColorClear(COLOR_B_YELLOW, " ▶ "+message))
 	case ErrorLevel:
 		if LogDestination[3] != "DISCARD" && LogDestination[3] != "STDOUT" && LogDestination[3] != "STDERR" {
 			//Then we are going to file
@@ -172,7 +172,7 @@ func LogM(level LogLevel, message string) error {
 			}
 			Error.SetOutput(logfile)
 		}
-		Error.Println(message)
+		Error.Println(ColorClear(COLOR_B_RED, " ▶ "+message))
 	}
 
 	return nil
