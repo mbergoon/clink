@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"strings"
 )
 
 // CmdMode describes the current mode Clink is running in. Describing the actions
@@ -32,20 +33,30 @@ const (
 const (
 	DEFAULT_MODE        CmdMode  = 1
 	DEFAULT_EXEC_MODE   ExecMode = 0
-	DEFAULT_CONFIG_FILE string   = "clink.conf"
+	DEFAULT_CONFIG_FILE string   = ""
 	DEFAULT_HOST_URI    string   = ""
 )
 
 // ClinkConfig is the configuration for the Clink command. Detailing how the command will
 // execute.
 type ClinkConfig struct {
-	cmdMode        CmdMode
-	execMode       ExecMode
-	configFile     string
-	hostUri        string
-	logLevel       string
-	logMode        string
-	logDestination [4]string
+	cmdMode         CmdMode
+	execMode        ExecMode
+	configFile      string
+	logLevel        string
+	logMode         string
+	logDestination  [4]string
+	interval        int
+	intervalFail    int
+	intervalSuccess int
+	hosts           []string
+	internalHosts   []string
+	timeout         int
+	distributed     bool
+	external        bool
+	internalNodes   []string
+	externalNodes   []string
+	duration        int
 }
 
 // NewClinkConfig creates a new clink configuration. Note: the values take the zero value
@@ -65,9 +76,20 @@ func commandUsage() {
 	fmt.Printf("	Execute Mode\n")
 	fmt.Printf("		-echo 			Execute icmp echo monitoring\n")
 	fmt.Printf("		-pscan			Execute port scan monitoring\n")
-	fmt.Printf("	Input Description\n")
+	fmt.Printf("	Configuration Description\n")
 	fmt.Printf("		-file 			Configuration file to describe execution of monitoring task\n")
-	fmt.Printf("		-host 			Configure clink to launch scan on defined host\n")
+	fmt.Printf("	Configuration Options\n")
+	fmt.Printf("		-interval		Interval (ms) for rescanning each host\n")
+	fmt.Printf("		-interval-fail		Fail retry interval (ms) (overrides -interval) \n")
+	fmt.Printf("		-interval-success	Success retry interval (ms) (overrides -interval) \n")
+	fmt.Printf("		-host 			Configure clink to launch scan on defined host(s)\n")
+	fmt.Printf("		-internal-hosts		List (comma delimited) of hosts to only scan from internal if -distributed\n")
+	fmt.Printf("		-timeout		Time (ms) to wait before closing connection and failing \n")
+	fmt.Printf("		-distributed		Launch scan on defined external hosts concurrently\n")
+	fmt.Printf("		-external		Sets current (local) monitor context to external\n")
+	fmt.Printf("		-internal-nodes		List of internal scanning nodes\n")
+	fmt.Printf("		-external-nodes		List of external scanning nodes\n")
+	fmt.Printf("		-duration		Time (ms) to run monitor\n")
 	fmt.Printf("	Logging Level\n")
 	fmt.Printf("		-log-level		Set level of logging to include options: [TRACE|INFO|WARNING|ERROR] default: INFO\n")
 	fmt.Printf("	Logging Destination\n")
@@ -93,9 +115,8 @@ func (c *ClinkConfig) HandleFlags() {
 	var echo = flag.Bool("echo", false, "execute mode 'icmp echo monitor'")
 	var pscan = flag.Bool("pscan", false, "execute mode 'port scan monitor'")
 
-	//File or Host
-	flag.StringVar(&(c.configFile), "file", "clink.conf", "configuration file describing scan")
-	flag.StringVar(&(c.hostUri), "host", "127.0.0.1", "host to scan")
+	//File
+	flag.StringVar(&(c.configFile), "file", "", "configuration file describing scan")
 
 	//Log Level
 	var logLevel = flag.String("log-level", "INFO", "minimum log level to write")
@@ -105,6 +126,19 @@ func (c *ClinkConfig) HandleFlags() {
 	var logInfoDest = flag.String("log-info-dest", "STDOUT", "stream or file to write on")
 	var logWarningDest = flag.String("log-warning-dest", "STDERR", "stream or file to write on")
 	var logErrorDest = flag.String("log-error-dest", "STDERR", "stream or file to write on")
+
+	//Configuration Options
+	var interval = flag.Int("interval", 1000, "")
+	var intervalFail = flag.Int("interval-fail", 1000, "")
+	var intervalSuccess = flag.Int("--success", 1000, "")
+	var hosts = flag.String("hosts", "", "hosts to scan")
+	var internalHosts = flag.String("internal-hosts", "", "")
+	var timeout = flag.Int("timeout", 5000, "")
+	var distributed = flag.Bool("distributed", false, "")
+	var external = flag.Bool("external", false, "")
+	var internalNodes = flag.String("internal-nodes", "", "")
+	var externalNodes = flag.String("external-nodes", "", "")
+	var duration = flag.Int("duration", 10000, "")
 
 	flag.Parse()
 
@@ -129,6 +163,20 @@ func (c *ClinkConfig) HandleFlags() {
 		c.execMode = UNDFMON
 	}
 
+	c.interval = *interval
+	c.intervalFail = *intervalFail
+	c.intervalSuccess = *intervalSuccess
+	c.timeout = *timeout
+	c.duration = *duration
+
+	c.distributed = *distributed
+	c.external = *external
+
+	c.hosts = strings.Split(*hosts, ",")
+	c.internalHosts = strings.Split(*internalHosts, ",")
+	c.internalNodes = strings.Split(*internalNodes, ",")
+	c.externalNodes = strings.Split(*externalNodes, ",")
+
 	//Build log config
 	c.logLevel = *logLevel
 
@@ -138,6 +186,75 @@ func (c *ClinkConfig) HandleFlags() {
 	logDests[2] = *logWarningDest
 	logDests[3] = *logErrorDest
 	c.logDestination = logDests
+
+}
+
+// MonitorFromClinkConfig generates a basic monitor as described by ClinkConfig
+// making use of defaults, and other assumptions to run from CLI without specifying
+// a config file.
+func (c *ClinkConfig) MonitorFromClinkConfig() (MonitorConfig, error) {
+	m := &MonitorConfig{
+		Id:               0,
+		Name:             "CLI-CONFIG",
+		Probes:           *new([]Probe),
+		Timeout:          c.timeout,
+		Stype:            "CLI",
+		ScanFrequency:    c.interval,
+		Distributed:      c.distributed,
+		DistributedNodes: *new([]Node),
+		Internal:         !c.external,
+		Interval:         c.interval,
+		IntervalFail:     c.intervalFail,
+		IntervalSuccess:  c.intervalSuccess,
+	}
+
+	for _, n := range c.internalNodes {
+		if n != "" {
+			node := Node{
+				Name:     n,
+				Host:     n,
+				Internal: true,
+			}
+			m.DistributedNodes = append(m.DistributedNodes, node)
+		}
+	}
+
+	for _, n := range c.externalNodes {
+		if n != "" {
+			node := Node{
+				Name:     n,
+				Host:     n,
+				Internal: true,
+			}
+			m.DistributedNodes = append(m.DistributedNodes, node)
+		}
+	}
+
+	for _, h := range c.internalHosts {
+		if h != "" {
+			probe := Probe{
+				Name:                 h,
+				Host:                 h,
+				Internal:             true,
+				ScanFromInternalOnly: true,
+			}
+			m.Probes = append(m.Probes, probe)
+		}
+	}
+
+	for _, h := range c.hosts {
+		if h != "" {
+			probe := Probe{
+				Name:                 h,
+				Host:                 h,
+				Internal:             false,
+				ScanFromInternalOnly: false,
+			}
+			m.Probes = append(m.Probes, probe)
+		}
+	}
+
+	return *m, nil
 }
 
 // Process to follow...

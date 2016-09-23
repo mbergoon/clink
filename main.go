@@ -1,33 +1,77 @@
 package main
 
-import "fmt"
+import (
+	"bytes"
+	"fmt"
+	"io/ioutil"
+	"os"
+)
 
 // configure initializes loggers and application arguments.
-func configure(c *ClinkConfig) {
+func configure(c *ClinkConfig) MonitorConfig {
 	c.HandleFlags()
 	InitLoggers(c)
+
+	appInit()
+
+	LogM(TraceLevel, "Built ClinkConfig with - "+fmt.Sprint(c))
+
+	if c.configFile != "" {
+		LogM(InfoLevel, "Attempting to read specified clink MonitorConfig")
+
+		data, err := ioutil.ReadFile(c.configFile)
+		if err != nil {
+			LogM(ErrorLevel, "Failed to open/read the file - "+c.configFile)
+			os.Exit(-1)
+		}
+		m, err := ParseMonitorConfig(bytes.NewReader(data))
+		if err != nil {
+			LogM(ErrorLevel, "Failed to parse configuration file")
+			os.Exit(-1)
+		}
+		LogM(InfoLevel, "Read specified clink MonitorConfig successfully")
+		LogM(TraceLevel, "Parsed MonitorConfiguration with - "+fmt.Sprint(m))
+		return m
+	} else {
+		LogM(InfoLevel, "Clink MonitorConfig not specified. Attempting to build config from flags.")
+		//Build config from options
+		m, err := c.MonitorFromClinkConfig()
+		if err != nil {
+			LogM(ErrorLevel, "Failed to build monitor from CLI flags.")
+			os.Exit(-1)
+		}
+		LogM(InfoLevel, "Built config from flags successfully")
+		LogM(TraceLevel, "Built MonitorConfig from flags with - "+fmt.Sprint(m))
+		return m
+	}
 }
 
-func appIntro() {
-	LogM(InfoLevel, "Hello from info log")
-	LogM(TraceLevel, "Hello from trace log")
-	LogM(WarningLevel, "Hello from warn log")
-	LogM(ErrorLevel, "Hello from error log")
+// appInit handle boiler plate initialization. Called after flags are parse, and loggers
+// are initialized but before configuration is constructed.
+func appInit() {
+	LogM(InfoLevel, "Initializing clink - building monitor based on settings.")
 }
 
+// main entry point for clink
 func main() {
-
 	cconf := NewClinkConfig()
 	configure(cconf)
 
-	// fmt.Println(CLR_0 + "HELLO" + CLR_N + CLR_R + "HELLO" + CLR_N + CLR_G + "HELLO" + CLR_N + CLR_Y + "HELLO" + CLR_N + CLR_B + "HELLO" + CLR_N + CLR_M + "HELLO" + CLR_N + CLR_C + "HELLO" + CLR_N + CLR_W + "HELLO" + CLR_N)
+	switch {
+	case cconf.cmdMode == MNGE:
+		LogM(TraceLevel, "Command mode manage (MNGE) set")
 
-	// fmt.Println("\x1b[31;1m hello \x1b[0m")
+	case cconf.cmdMode == RPRT:
+		LogM(TraceLevel, "Command mode report (RPRT) set")
 
-	for i := 0; i < 100; i++ {
-		appIntro()
+	case cconf.cmdMode == EXEC:
+		LogM(TraceLevel, "Command mode execute (EXEC) set")
+
+	case cconf.cmdMode == UNDF:
+		LogM(ErrorLevel, "Command mode not specfied or unrecognized - specify [-m (MNGE)|-r (RPRT)|-e (EXEC)]")
+		os.Exit(-1)
+	default:
+		LogM(ErrorLevel, "Command mode not specfied or incorrect - specify [MNGE|RPRT|EXEC]")
+		os.Exit(-1)
 	}
-
-	fmt.Println(*cconf)
-
 }
