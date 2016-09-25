@@ -132,6 +132,7 @@ func (c *ClinkConfig) HandleFlags() {
 	var intervalFail = flag.Int("interval-fail", 1000, "")
 	var intervalSuccess = flag.Int("--success", 1000, "")
 	var hosts = flag.String("hosts", "", "hosts to scan")
+
 	var internalHosts = flag.String("internal-hosts", "", "")
 	var timeout = flag.Int("timeout", 5000, "")
 	var distributed = flag.Bool("distributed", false, "")
@@ -141,6 +142,9 @@ func (c *ClinkConfig) HandleFlags() {
 	var duration = flag.Int("duration", 10000, "")
 
 	flag.Parse()
+
+	var tailHosts = flag.Args()
+	fmt.Println(tailHosts)
 
 	//Build config
 	switch {
@@ -173,6 +177,7 @@ func (c *ClinkConfig) HandleFlags() {
 	c.external = *external
 
 	c.hosts = strings.Split(*hosts, ",")
+	c.hosts = append(c.hosts, tailHosts...)
 	c.internalHosts = strings.Split(*internalHosts, ",")
 	c.internalNodes = strings.Split(*internalNodes, ",")
 	c.externalNodes = strings.Split(*externalNodes, ",")

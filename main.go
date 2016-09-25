@@ -70,7 +70,9 @@ func main() {
 	case cconf.cmdMode == EXEC:
 		LogM(TraceLevel, "Command mode execute (EXEC) set")
 		for {
-			LogM(InfoLevel, fmt.Sprint(icmpecho.Echo("192.168.9.1", 3000)))
+			for _, probe := range m.Probes {
+				LogM(InfoLevel, probe.Name+":"+probe.Host+" "+fmt.Sprint(icmpecho.Echo(probe.Host, 3000)))
+			}
 			time.Sleep(time.Duration(m.Interval) * time.Millisecond)
 		}
 	case cconf.cmdMode == UNDF:
