@@ -6,6 +6,14 @@ import (
 	"strings"
 )
 
+// Default Clink configuration values
+const (
+	DEFAULT_MODE        CmdMode  = 1
+	DEFAULT_EXEC_MODE   ExecMode = 0
+	DEFAULT_CONFIG_FILE string   = ""
+	DEFAULT_HOST_URI    string   = ""
+)
+
 // CmdMode describes the current mode Clink is running in. Describing the actions
 // which are available to take.
 type CmdMode int
@@ -27,14 +35,6 @@ const (
 	ECHOMON ExecMode = iota
 	PSCNMON
 	UNDFMON
-)
-
-// Default Clink configuration values
-const (
-	DEFAULT_MODE        CmdMode  = 1
-	DEFAULT_EXEC_MODE   ExecMode = 0
-	DEFAULT_CONFIG_FILE string   = ""
-	DEFAULT_HOST_URI    string   = ""
 )
 
 // ClinkConfig is the configuration for the Clink command. Detailing how the command will

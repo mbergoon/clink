@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"time"
+
+	"github.com/mbergoon/clink/icmpecho"
 )
 
 // configure initializes loggers and application arguments.
@@ -55,7 +58,7 @@ func appInit() {
 // main entry point for clink
 func main() {
 	cconf := NewClinkConfig()
-	configure(cconf)
+	m := configure(cconf)
 
 	switch {
 	case cconf.cmdMode == MNGE:
@@ -66,7 +69,10 @@ func main() {
 
 	case cconf.cmdMode == EXEC:
 		LogM(TraceLevel, "Command mode execute (EXEC) set")
-
+		for {
+			LogM(InfoLevel, fmt.Sprint(icmpecho.Echo("192.168.9.1", 3000)))
+			time.Sleep(time.Duration(m.Interval) * time.Millisecond)
+		}
 	case cconf.cmdMode == UNDF:
 		LogM(ErrorLevel, "Command mode not specfied or unrecognized - specify [-m (MNGE)|-r (RPRT)|-e (EXEC)]")
 		os.Exit(-1)

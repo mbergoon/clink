@@ -8,19 +8,25 @@ import (
 
 /*{
 	"Id": 100,
-	"Name": "cameron",
+	"Name": "Monitor01",
 	"Probes": [
-		{"Name": "PName", "Host": "PHost", "ScanFromInternalOnly": true, "IsInternalResource": true},
-		{"Name": "PName1", "Host": "PHost1", "ScanFromInternalOnly": true, "IsInternalResource": true}
+		{"Name": "PName", "Host": "PHost", "ScanFromInternalOnly": true, "Internal": true},
+		{"Name": "PName1", "Host": "PHost1", "ScanFromInternalOnly": true, "Internal": true}
 	],
-	"Duration": 99,
+	"Timeout": 5000,
 	"Stype": "ECHO",
-	"Internal": false,
 	"ScanFrequency": 10,
-	"DistributedScan": false,
-	"DistributedHosts": [
-		"clink-01.com", "clink-02.com"
-	]
+	"Distributed": true,
+	"DistributedNodes": [
+		{"Name": "US01", "Host": "clink-01.co.us", "Internal": false},
+		{"Name": "US02", "Host": "clink-02.co.us", "Internal": false},
+		{"Name": "UK01", "Host": "clink-01.co.uk", "Internal": false}
+	],
+	"Internal": true,
+	"Interval": 100,
+	"IntervalFail": 10,
+	"IntervalSuccess": 200,
+	"Duration": 99
 }*/
 
 type MonitorConfig struct {
