@@ -144,7 +144,6 @@ func (c *ClinkConfig) HandleFlags() {
 	flag.Parse()
 
 	var tailHosts = flag.Args()
-	fmt.Println(tailHosts)
 
 	//Build config
 	switch {
