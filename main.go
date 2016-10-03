@@ -71,7 +71,9 @@ func main() {
 		LogM(TraceLevel, "Command mode execute (EXEC) set")
 		for {
 			for _, probe := range m.Probes {
-				LogM(InfoLevel, probe.Name+":"+probe.Host+" "+fmt.Sprint(icmpecho.Echo(probe.Host, 3000)))
+				ok, start, elapsed, sent, received, err := icmpecho.Echo(probe.Host, 3000)
+				LogM(InfoLevel, probe.Name+":"+probe.Host+" "+fmt.Sprint(ok, start, elapsed, sent, received, err))
+				fmt.Println("test " + ColorClear(COLOR_BLUE, elapsed.String()))
 			}
 			time.Sleep(time.Duration(m.Interval) * time.Millisecond)
 		}
