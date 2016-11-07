@@ -24,8 +24,6 @@ import (
 	],
 	"Internal": true,
 	"Interval": 100,
-	"IntervalFail": 10,
-	"IntervalSuccess": 200,
 	"Duration": 99
 }*/
 
@@ -40,8 +38,6 @@ type MonitorConfig struct {
 	DistributedNodes []Node
 	Internal         bool
 	Interval         int
-	IntervalFail     int
-	IntervalSuccess  int
 	Duration         int
 }
 

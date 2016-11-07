@@ -40,23 +40,21 @@ const (
 // ClinkConfig is the configuration for the Clink command. Detailing how the command will
 // execute.
 type ClinkConfig struct {
-	cmdMode         CmdMode
-	execMode        ExecMode
-	configFile      string
-	logLevel        string
-	logMode         string
-	logDestination  [4]string
-	interval        int
-	intervalFail    int
-	intervalSuccess int
-	hosts           []string
-	internalHosts   []string
-	timeout         int
-	distributed     bool
-	external        bool
-	internalNodes   []string
-	externalNodes   []string
-	duration        int
+	cmdMode        CmdMode
+	execMode       ExecMode
+	configFile     string
+	logLevel       string
+	logMode        string
+	logDestination [4]string
+	interval       int
+	hosts          []string
+	internalHosts  []string
+	timeout        int
+	distributed    bool
+	external       bool
+	internalNodes  []string
+	externalNodes  []string
+	duration       int
 }
 
 // NewClinkConfig creates a new clink configuration. Note: the values take the zero value
@@ -68,7 +66,7 @@ func NewClinkConfig() *ClinkConfig {
 // commandUsage provides a custom usage prompt to overcome readablilty challenges
 // presented by default flags implementation.
 func commandUsage() {
-	fmt.Printf("Usage: clink -[m|e|r[options]] -[echo|scan[options]] -[host|file]>\n")
+	fmt.Printf("Usage: clink -[m|e|r [options]] -[echo|scan[options]] -[host|file]>\n")
 	fmt.Printf("	Command Mode\n")
 	fmt.Printf("		-m 			Management mode\n")
 	fmt.Printf("		-e 			Execute mode\n")
@@ -80,8 +78,6 @@ func commandUsage() {
 	fmt.Printf("		-file 			Configuration file to describe execution of monitoring task\n")
 	fmt.Printf("	Configuration Options\n")
 	fmt.Printf("		-interval		Interval (ms) for rescanning each host\n")
-	fmt.Printf("		-interval-fail		Fail retry interval (ms) (overrides -interval) \n")
-	fmt.Printf("		-interval-success	Success retry interval (ms) (overrides -interval) \n")
 	fmt.Printf("		-host 			Configure clink to launch scan on defined host(s)\n")
 	fmt.Printf("		-internal-hosts		List (comma delimited) of hosts to only scan from internal if -distributed\n")
 	fmt.Printf("		-timeout		Time (ms) to wait before closing connection and failing \n")
@@ -129,8 +125,6 @@ func (c *ClinkConfig) HandleFlags() {
 
 	//Configuration Options
 	var interval = flag.Int("interval", 1000, "")
-	var intervalFail = flag.Int("interval-fail", 1000, "")
-	var intervalSuccess = flag.Int("--success", 1000, "")
 	var hosts = flag.String("hosts", "", "hosts to scan")
 
 	var internalHosts = flag.String("internal-hosts", "", "")
@@ -167,8 +161,6 @@ func (c *ClinkConfig) HandleFlags() {
 	}
 
 	c.interval = *interval
-	c.intervalFail = *intervalFail
-	c.intervalSuccess = *intervalSuccess
 	c.timeout = *timeout
 	c.duration = *duration
 
@@ -208,8 +200,6 @@ func (c *ClinkConfig) MonitorFromClinkConfig() (MonitorConfig, error) {
 		DistributedNodes: *new([]Node),
 		Internal:         !c.external,
 		Interval:         c.interval,
-		IntervalFail:     c.intervalFail,
-		IntervalSuccess:  c.intervalSuccess,
 	}
 
 	for _, n := range c.internalNodes {

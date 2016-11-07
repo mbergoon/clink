@@ -5,9 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"time"
-
-	"github.com/mbergoon/clink/icmpecho"
 )
 
 // configure initializes loggers and application arguments.
@@ -67,21 +64,11 @@ func main() {
 	case cconf.cmdMode == RPRT:
 		LogM(TraceLevel, "Command mode report (RPRT) set")
 
-	case cconf.cmdMode == EXEC:
-		LogM(TraceLevel, "Command mode execute (EXEC) set")
-		for {
-			for _, probe := range m.Probes {
-				ok, start, elapsed, sent, received, err := icmpecho.Echo(probe.Host, 3000)
-				LogM(InfoLevel, probe.Name+":"+probe.Host+" "+fmt.Sprint(ok, start, elapsed, sent, received, err))
-				fmt.Println("test " + ColorClear(COLOR_BLUE, elapsed.String()))
-			}
-			time.Sleep(time.Duration(m.Interval) * time.Millisecond)
-		}
-	case cconf.cmdMode == UNDF:
-		LogM(ErrorLevel, "Command mode not specfied or unrecognized - specify [-m (MNGE)|-r (RPRT)|-e (EXEC)]")
-		os.Exit(-1)
 	default:
-		LogM(ErrorLevel, "Command mode not specfied or incorrect - specify [MNGE|RPRT|EXEC]")
-		os.Exit(-1)
+		LogM(TraceLevel, "Command mode execute (EXEC) set")
+
+		executor := NewExecutor()
+		executor.Exec(m)
+
 	}
 }

@@ -21,6 +21,17 @@ const (
 	icmpv6EchoReply   = 129
 )
 
+type EchoResult struct {
+	Address  string
+	Name     string
+	Status   bool
+	Start    time.Time
+	Elapsed  time.Duration
+	Sent     int
+	Received int
+	Err      error
+}
+
 type icmpMessage struct {
 	Type     int             // type
 	Code     int             // code
@@ -122,11 +133,20 @@ func parseICMPEcho(b []byte) (*icmpEcho, error) {
 }
 
 // Echoer convienence method wrapping Pinger method to gather time and other stats.
-func Echo(address string, timeout int) (ok bool, start time.Time, elapsed time.Duration, sent int, received int, err error) {
-	start = time.Now()
-	ok, sent, received, err = Echoer(address, timeout)
-	elapsed = time.Since(start)
-	return
+func Echo(name string, address string, timeout int) EchoResult {
+	start := time.Now()
+	ok, sent, received, err := Echoer(address, timeout)
+	elapsed := time.Since(start)
+	return EchoResult{
+		Address:  address,
+		Name:     name,
+		Status:   ok,
+		Start:    start,
+		Elapsed:  elapsed,
+		Sent:     sent,
+		Received: received,
+		Err:      err,
+	}
 }
 
 // Echoer provides actual Dial to requested host. Handles response and reports.

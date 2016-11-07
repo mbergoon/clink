@@ -13,7 +13,7 @@ const (
 	COLOR_B_WHITE  ColorCode = "\x1b[37;1m"
 
 	COLOR_BLACK  ColorCode = "\x1b[30m"
-	COLOR_RER    ColorCode = "\x1b[31m"
+	COLOR_RED    ColorCode = "\x1b[31m"
 	COLOR_GREEN  ColorCode = "\x1b[32m"
 	COLOR_YELLOW ColorCode = "\x1b[33m"
 	COLOR_BLUE   ColorCode = "\x1b[34m"
