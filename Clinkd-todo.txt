@@ -1,0 +1,92 @@
+###Clinkd Todo 
+
+####Data Model
+	Auth/Organizations
+		Accounts
+		Users
+		AccountUsers
+		AccountMonitors
+		Monitors
+
+	NoSql Scan Results
+
+	Distributed Nodes
+
+####Endpoints
+	ICMP Echo request
+	
+	Authenticate
+
+	Historical Data Query
+		Timerange
+		Node
+		Success/Failure
+		Probe(Target IP/Domain Name)
+	
+	Socket Connection to Push Live Ping Results
+
+	Add/Edit/Delete Auth/Organizations
+
+	Raft Management Endpoints
+		AppendEntries
+		RequestVote
+		Snapshot
+		e
+
+###Architecture
+	RAFT Consensus for HA 
+		Default Master
+
+	[Request] --						== [Node01 (Mastr)] --+ > RCLink
+		 	     \					  //					  | 
+	[Request] ------ [ReverseProxy] ------ [Node02 (Slave)] --+ > RCLink
+			     /					  \				    	  | 
+	[Request] --					    -- [Node03 (Slave)] --+ > RCLink
+
+	Leader Queries Nodes
+	Proxy To Cluster (Finds/Knows Leader) ("Are You Master?" Query)
+
+####Interface Flag
+	Simple 
+	Complex
+
+###Learning 
+	SSL on Proxy with LetsEncrypt
+	Raft Consensus 
+
+###Implementation Structure 
+	
+	Main
+		CompleteWork Queue
+		NewWork Queue
+
+		Channel To Indicate Raft Status
+
+	Go1
+		Raft
+			Read queue push updates to logs 
+			Heartbeat
+			Manage election 
+			Raft Process?
+				1. 
+				2. 
+			API for "Are You Master?" Query
+
+	Go2
+		Webserver 
+			Serve Static resources
+			API 
+			AUTH
+			Go2.1
+				Websocket pull for updates and send 
+
+	Go3
+		Receive Work from NewWork queue
+		Work queue running monitors
+		cron to schedule monitors
+		Send to complete work queue
+
+
+
+
+

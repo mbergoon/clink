@@ -21,7 +21,7 @@ func configure(c *ClinkConfig) MonitorConfig {
 
 		data, err := ioutil.ReadFile(c.configFile)
 		if err != nil {
-			LogM(ErrorLevel, "Failed to open/read the file - "+c.configFile)
+			LogM(ErrorLevel, "Failed to open/read the file - "+ c.configFile)
 			os.Exit(-1)
 		}
 		m, err := ParseMonitorConfig(bytes.NewReader(data))
